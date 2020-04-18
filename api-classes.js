@@ -47,6 +47,17 @@ class StoryList {
     // TODO - Implement this functions!
     // this function should return the newly created story so it can be used in
     // the script.js file where it will be appended to the DOM
+    console.log(user.loginToken);
+    console.log(newStory);
+    try {
+      const response = await axios.post(`${BASE_URL}/stories`, {
+        token: user.loginToken,
+        story: newStory
+      });
+    } catch (e) {
+      "error posting stories";
+      console.log(e)
+    }
   }
 }
 

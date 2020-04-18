@@ -8,6 +8,8 @@ $(async function() {
   const $ownStories = $("#my-articles");
   const $navLogin = $("#nav-login");
   const $navLogOut = $("#nav-logout");
+  const $navLinks = $('.main-nav-links');
+  const $userprofile = $('#user-profile')
 
   // global storyList variable
   let storyList = null;
@@ -57,6 +59,53 @@ $(async function() {
     loginAndSubmitForm();
   });
 
+  /** 
+   * Main nav links click functionality
+   */
+  $navLinks.on('click', function(evt) {
+    const id = evt.target.id;
+    if(id==='nav-submit') {
+      $("#submit-form").toggle('hidden');
+    } else if (id==='nav-favorites') {
+      console.log('favorites');
+      $allStoriesList.hide();
+      $("#submit-form").hide();
+      $userprofile.hide();
+
+    } else if (id==='nav-my-stories') {
+      console.log('my stories');
+
+      $allStoriesList.hide();
+      $userprofile.hide();
+    } else {
+      console.log('unknown navlink clicked');
+    };
+  });
+
+
+ /** 
+  * Submit story form functionality 
+  */
+ $('#submit-form').on('submit', async function(evt) {
+   evt.preventDefault();
+   console.log('story submitted');
+   let author = $("#author").val();
+   let title = $("#title").val();
+   let url = $('#url').val();
+
+   let story = {author, title, url};
+   storyList = await StoryList.getStories();
+   
+   console.log(currentUser);
+   storyList.addStory(currentUser, story);
+   $('#submit-form').each(function() {
+     this.reset();
+    });
+   $("#submit-form").toggleClass('hidden');
+   await generateStories();
+ })
+
+
   /**
    * Log Out Functionality
    */
@@ -88,6 +137,10 @@ $(async function() {
     await generateStories();
     $allStoriesList.show();
   });
+
+  $('.articles-container').on('click', function(e) {
+    console.log(e.target.parentElement.parentElement.id);
+  })
 
   /**
    * On page load, checks local storage to see if the user is already logged in.
@@ -160,6 +213,10 @@ $(async function() {
     // render story markup
     const storyMarkup = $(`
       <li id="${story.storyId}">
+        <span class="star">
+          <i class="far fa-star">
+          </i>
+          </span>
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
@@ -189,6 +246,7 @@ $(async function() {
   function showNavForLoggedInUser() {
     $navLogin.hide();
     $navLogOut.show();
+    $navLinks.toggleClass('hidden');
   }
 
   /* simple function to pull the hostname from a URL */
