@@ -182,7 +182,9 @@ class User {
   }
 
 
-
+/**
+ * Function to unfavorite a story
+ */
   async removeFavoriteStory(storyId) {
     const url = `https://hack-or-snooze-v3.herokuapp.com/users/${this.username}/favorites/${storyId}`;    
     const response  = await axios({
@@ -221,7 +223,28 @@ class User {
     //   console.log(e)
     // }
   }
+
+  /**
+   * Function to delete a story
+   */
+  async deleteStory(storyId) {
+    const url = `https://hack-or-snooze-v3.herokuapp.com/stories/${storyId}`;    
+    const response  = await axios({
+      url:url,
+      method:'DELETE',
+      data:{
+        token: this.loginToken
+      }
+    })
+
+    const deleteResult = response.data;
+    if(deleteResult.story!=null) {
+      return true;
+    }
+  }
 }
+
+
 
 
 /**

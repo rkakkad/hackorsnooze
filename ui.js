@@ -78,10 +78,15 @@ $(async function() {
       hideElements()
 
       $favoriteStories.empty();
-      for (let story of currentUser.favorites) {
-        const result = generateStoryHTML(story,storyType);
-        $favoriteStories.append(result);
+      if(currentUser.favorites.length==0) {
+        $favoriteStories.append("<h5>No favorites selected yet</h5>")
+      } else {
+        for (let story of currentUser.favorites) {
+          const result = generateStoryHTML(story,storyType);
+          $favoriteStories.append(result);
+        }
       }
+
       $favoriteStories.show();
   });
 
@@ -91,10 +96,15 @@ $(async function() {
     const  storyType = 'ownStory';
     hideElements();
     $ownStories.empty();
+    if(currentUser.ownStories.length==0) {
+      $ownStories.append("<h5>No stories added yet</h5>")
+    } else {
+
     for (let story of currentUser.ownStories) {
         const result = generateStoryHTML(story,storyType);
         $ownStories.append(result);
       }
+    }
     $ownStories.show();
 
   });
@@ -124,7 +134,6 @@ $(async function() {
 
     
 })
-
 
 
   /**
@@ -159,6 +168,9 @@ $(async function() {
     $allStoriesList.show();
   });
 
+  /**
+   * Event handler for clicking on a star
+   */
   $('.articles-container').on('click', ".star", function(e) {
     let $target = $(e.target);
     const storyId= e.target.parentElement.parentElement.id;
@@ -174,6 +186,24 @@ $(async function() {
     $target.toggleClass('fas');
     $target.toggleClass('far');
   })
+
+  /**
+   * Event handler for clikcing on a delete
+   */
+  $('.articles-container').on('click', ".trash-can", async function(e) {
+    let $target = $(e.target);
+    const storyId= e.target.parentElement.parentElement.id;
+    const deleteResult = await currentUser.deleteStory(storyId);
+    if(deleteResult) {
+      currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username);
+    }
+    // hide elements 
+    hideElements();
+
+    // show the list of stories
+    $allStoriesList.show();
+  })
+   
 
   /**
    * Function to handle clikcing in favorites menu
@@ -349,4 +379,5 @@ $(async function() {
     }
     return false;
   } 
+  $userprofile.hide()
 });
