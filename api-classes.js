@@ -47,13 +47,12 @@ class StoryList {
     // TODO - Implement this functions!
     // this function should return the newly created story so it can be used in
     // the script.js file where it will be appended to the DOM
-    console.log(user.loginToken);
-    console.log(newStory);
     try {
       const response = await axios.post(`${BASE_URL}/stories`, {
         token: user.loginToken,
         story: newStory
       });
+      // user.ownStories = response.data.user.ownStories;
     } catch (e) {
       "error posting stories";
       console.log(e)
@@ -162,7 +161,68 @@ class User {
     existingUser.ownStories = response.data.user.stories.map(s => new Story(s));
     return existingUser;
   }
+
+  async addFavoriteStory(storyId) {
+    const url = `https://hack-or-snooze-v3.herokuapp.com/users/${this.username}/favorites/${storyId}`;    
+   try {
+      const response = await axios.post(url, {
+        token: this.loginToken,
+      });
+      const newFavorites = response.data.user.favorites;
+      if(newFavorites != null ) {
+        this.favorites = newFavorites; 
+      } else {
+        alert('no favorites returned');
+      }
+
+    } catch (e) {
+      alert("error adding Favourite stories");
+      // console.log(e)
+    }
+  }
+
+
+
+  async removeFavoriteStory(storyId) {
+    const url = `https://hack-or-snooze-v3.herokuapp.com/users/${this.username}/favorites/${storyId}`;    
+    const response  = await axios({
+      url:url,
+      method:'DELETE',
+      data:{
+        token: this.loginToken
+      }
+    })
+    const newFavorites = response.data.user.favorites;
+    if(newFavorites != null ) {
+      this.favorites = newFavorites; 
+    } else {
+      alert('no favorites returned');
+    }
+    
+    
+    /** 
+ * Why doesn't this work??
+ */
+    // try {
+    //   console.log('trying to delte')
+    //   const response = await axios.DELETE(url, {data:{
+    //     token: this.loginToken,
+    //   }});
+    //   console.log(response.data);
+    //   console.log('fav deleted')
+    //   const newFavorites = response.data.user.favorites;
+    //   if(newFavorites) {
+    //     this.favorites = newFavorites; 
+    //   } else {
+    //     alert('no favorites returned');
+    //   }
+    // } catch (e) {
+    //   alert("error deleting Favourite stories");
+    //   console.log(e)
+    // }
+  }
 }
+
 
 /**
  * Class to represent a single story.
